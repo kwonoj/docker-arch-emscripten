@@ -1,0 +1,26 @@
+os: linux
+dist: trusty
+sudo: required
+services:
+  - docker
+
+matrix:
+  # let whole build fails if one of matrix build config fails
+  fast_finish: true
+
+  include:
+    - env:
+      - DOCKER_REPO='ojkwon/arch-emscripten'
+
+script:
+  - COMMIT=${TRAVIS_COMMIT::8}
+  # set docker tag based on last commit short sha.
+  - DOCKER_TAG=$DOCKER_REPO:${COMMIT}
+  - tput setaf 2; echo building docker image tagged as $DOCKER_TAG
+  - sudo docker build --tag $DOCKER_TAG .
+  - |
+    if [[ ! -z "${TRAVIS_TAG}" ]]; then
+      tput setaf 2; echo this build is tagged versioned build, pushing into registry
+      sudo docker login -u=ojkwon -p="$DOCKER_PASSWORD"
+      sudo docker push $DOCKER_TAG
+    fi

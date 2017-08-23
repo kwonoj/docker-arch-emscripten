@@ -5,6 +5,9 @@ MAINTAINER OJ Kwon <kwon.ohjoong@gmail.com>
 RUN pacman --noconfirm -Syu \
   emscripten \
   python \
+  unzip \
+  python-setuptools \
+  python2-setuptools \
   jre8-openjdk
 
 # Change subsequent execution shell to bash
