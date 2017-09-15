@@ -9,21 +9,34 @@ RUN pacman --noconfirm -Syyu
 
 # Install dependencies
 RUN pacman --noconfirm -S \
-  emscripten \
   unzip \
   python \
   python-setuptools \
   python2-setuptools \
   jre8-openjdk
+# emscripten // disabled while installing pinned down version
 
 # Change subsequent execution shell to bash
 SHELL ["/bin/bash", "-l", "-c"]
 
+#START emscripten--------------------------------
+# Install emscripten-1.37.18-1-x86_64.pkg.tar.xz
+# until binaryen clang failure (https://github.com/WebAssembly/binaryen/issues/1164) resolved
+
+RUN cd $TMPDIR && \
+  curl https://archive.archlinux.org/packages/e/emscripten/emscripten-1.37.18-1-x86_64.pkg.tar.xz > ./emscripten-1.37.18-1-x86_64.pkg.tar.xz && \
+  curl https://archive.archlinux.org/packages/e/emscripten/emscripten-1.37.18-1-x86_64.pkg.tar.xz.sig > ./emscripten-1.37.18-1-x86_64.pkg.tar.xz.sig && \
+  sudo pacman --noconfirm -U emscripten-1.37.18-1-x86_64.pkg.tar.xz
+
+#END emscripten--------------------------------
+
+#START preamble patch--------------------------------
 # Patch preamble.js to support Electron's renderer process with node.js environment
 # Refer https://github.com/kripken/emscripten/pull/5577 for detail.
 # TODO: remove based on upstream PR status
 COPY ./preamble.patch $TMPDIR/
 RUN patch /usr/lib/emscripten/src/preamble.js $TMPDIR/preamble.patch
+#END preamble patch--------------------------------
 
 # Initialize emcc
 RUN emcc
