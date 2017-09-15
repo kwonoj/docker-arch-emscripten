@@ -1,11 +1,14 @@
-FROM ojkwon/arch-nvm-node:4032238-node7.9-npm4
+FROM ojkwon/arch-nvm-node:7b0d30e-node8.4-npm5.4.1
 MAINTAINER OJ Kwon <kwon.ohjoong@gmail.com>
 
 # Build time args
 ARG BUILD_TARGET=""
 
+# Upgrade system
+RUN pacman --noconfirm -Syyu
+
 # Install dependencies
-RUN pacman --noconfirm -Syu \
+RUN pacman --noconfirm -S \
   emscripten \
   unzip \
   python \
@@ -15,6 +18,12 @@ RUN pacman --noconfirm -Syu \
 
 # Change subsequent execution shell to bash
 SHELL ["/bin/bash", "-l", "-c"]
+
+# Patch preamble.js to support Electron's renderer process with node.js environment
+# Refer https://github.com/kripken/emscripten/pull/5577 for detail.
+# TODO: remove based on upstream PR status
+COPY ./preamble.patch $TMPDIR/
+RUN patch /usr/lib/emscripten/src/preamble.js $TMPDIR/preamble.patch
 
 # Initialize emcc
 RUN emcc
