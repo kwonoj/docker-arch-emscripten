@@ -37,7 +37,7 @@ RUN if [[ "${BUILD_TARGET}" == "protobuf" ]]; then \
     echo "installing protobuf 3.1 dependency" && \
     mkdir $TMPDIR/proto31 && cd $TMPDIR/proto31 && \
     curl "https://git.archlinux.org/svntogit/packages.git/plain/trunk/PKGBUILD?h=packages/protobuf&id=fa8b9da391b26b6ace1941e9871a6416db74d67b" > ./PKGBUILD && \
-    makepkg && sudo pacman --noconfirm -U *.pkg.tar.xz && \
+    makepkg --skipchecksums && sudo pacman --noconfirm -U *.pkg.tar.xz && \
     cd $TMPDIR && git clone https://github.com/kwonoj/protobuf-emscripten && \
     cd $TMPDIR/protobuf-emscripten/3.1.0 && \
     sh autogen.sh && emconfigure ./configure && emmake make && \
