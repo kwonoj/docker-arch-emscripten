@@ -1,5 +1,5 @@
 diff --git a/src/preamble.js b/src/preamble.js
-index 70145dc0f..50b8e73c0 100644
+index 70145dc0f..7dedb3127 100644
 --- a/src/preamble.js
 +++ b/src/preamble.js
 @@ -2231,7 +2231,9 @@ function integrateWasmJS(Module) {
@@ -8,7 +8,7 @@ index 70145dc0f..50b8e73c0 100644
      // if we don't have the binary yet, and have the Fetch api, use that
 -    if (!Module['wasmBinary'] && typeof fetch === 'function') {
 +    // if Module overridded its environment to Node in Electron's renderer process, do not use fetch
-+    var electronNodeContext = Module["ENVIRONMENT"] === "NODE" && !!window.process && !!window.require;
++    var electronNodeContext = Module["ENVIRONMENT"] === "NODE" && typeof(window) !== 'undefined' && !!window.process && !!window.require;
 +    if (!Module['wasmBinary'] && typeof fetch === 'function' && !electronNodeContext) {
        return fetch(wasmBinaryFile, { credentials: 'same-origin' }).then(function(response) {
          if (!response['ok']) {
