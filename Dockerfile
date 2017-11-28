@@ -19,6 +19,19 @@ RUN pacman --noconfirm -S \
 # Change subsequent execution shell to bash
 SHELL ["/bin/bash", "-l", "-c"]
 
+# START gcc--------------------------------
+# Install gcc-7.1.1-4-x86_64.pkg.tar.xz
+# until binaryen clang failure (https://github.com/WebAssembly/binaryen/issues/1300) resolved
+
+RUN cd $TMPDIR && \
+  curl https://archive.archlinux.org/packages/g/gcc/gcc-7.1.1-4-x86_64.pkg.tar.xz > ./gcc-7.1.1-4-x86_64.pkg.tar.xz && \
+  curl https://archive.archlinux.org/packages/g/gcc/gcc-7.1.1-4-x86_64.pkg.tar.xz.sig > ./gcc-7.1.1-4-x86_64.pkg.tar.xz.sig && \
+  curl https://archive.archlinux.org/packages/g/gcc-libs/gcc-libs-7.1.1-4-x86_64.pkg.tar.xz > ./gcc-libs-7.1.1-4-x86_64.pkg.tar.xz && \
+  curl https://archive.archlinux.org/packages/g/gcc-libs/gcc-libs-7.1.1-4-x86_64.pkg.tar.xz.sig > ./gcc-libs-7.1.1-4-x86_64.pkg.tar.xz.sig && \
+  sudo pacman --noconfirm -U gcc-libs-7.1.1-4-x86_64.pkg.tar.xz gcc-7.1.1-4-x86_64.pkg.tar.xz
+
+# END gcc--------------------------------
+
 # Initialize emcc
 RUN emcc
 
