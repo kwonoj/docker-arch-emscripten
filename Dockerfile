@@ -1,4 +1,4 @@
-FROM ojkwon/arch-nvm-node:6c538cc-node7.9-npm5.4.2
+FROM ojkwon/arch-nvm-node:9457ad8-node8.9.1-npm5.6
 MAINTAINER OJ Kwon <kwon.ohjoong@gmail.com>
 
 # Build time args
