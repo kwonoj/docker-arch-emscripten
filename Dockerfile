@@ -1,8 +1,9 @@
-FROM ojkwon/arch-nvm-node:aa3f35d-node8.9.1-npm5.6
+FROM ojkwon/arch-nvm-node:801bb47-node-8.9.1-npm5.6
 MAINTAINER OJ Kwon <kwon.ohjoong@gmail.com>
 
 # Build time args
 ARG BUILD_TARGET=""
+ARG PROTOBUF_VERSION=""
 
 # Upgrade system
 RUN pacman --noconfirm -Syyu
@@ -32,25 +33,28 @@ RUN cd $TMPDIR && \
 
 # END gcc--------------------------------
 
-# Initialize emcc
-RUN emcc
-
 USER builder
 
-# Install 3.1 version of protobuf via makepkg instead of latest, to align with
-# protobuf-emscripten. Also build emscripten-protobuf as well, place build under
-# /home/builder/temp/.libs
+# Initialize emcc
+RUN emcc && emcc --version
+
+# Install specific version of protobuf corresponding to protobuf-wasm.
+RUN cd $TMPDIR && \
+  curl https://archive.archlinux.org/packages/p/protobuf/protobuf-$PROTOBUF_VERSION-1-x86_64.pkg.tar.xz > ./protobuf-$PROTOBUF_VERSION-1-x86_64.pkg.tar.xz && \
+  curl https://archive.archlinux.org/packages/p/protobuf/protobuf-$PROTOBUF_VERSION-1-x86_64.pkg.tar.xz.sig > ./protobuf-$PROTOBUF_VERSION-1-x86_64.pkg.tar.xz.sig && \
+  sudo pacman --noconfirm -U protobuf-$PROTOBUF_VERSION-1-x86_64.pkg.tar.xz
+
+# Build emscripten-wasm as well to generate lib build will be placed build under `/home/builder/temp/.libs`
 RUN if [[ "${BUILD_TARGET}" == "protobuf" ]]; then \
-    echo "installing protobuf 3.1 dependency" && \
-    mkdir $TMPDIR/proto31 && cd $TMPDIR/proto31 && \
-    curl "https://git.archlinux.org/svntogit/packages.git/plain/trunk/PKGBUILD?h=packages/protobuf&id=fa8b9da391b26b6ace1941e9871a6416db74d67b" > ./PKGBUILD && \
-    makepkg --skipchecksums && sudo pacman --noconfirm -U *.pkg.tar.xz && \
-    cd $TMPDIR && git clone https://github.com/kwonoj/protobuf-emscripten && \
-    cd $TMPDIR/protobuf-emscripten/3.1.0 && \
-    sh autogen.sh && emconfigure ./configure && emmake make && \
-    cp -r ./src/.libs $TMPDIR/ && \
-    ls $TMPDIR/.libs; \
-  fi
+      cd $TMPDIR && git clone https://github.com/google/protobuf && cd protobuf && git checkout v$PROTOBUF_VERSION &&\
+      cd $TMPDIR && git clone https://github.com/kwonoj/protobuf-wasm && \
+      cd $TMPDIR/protobuf-wasm && git checkout v$PROTOBUF_VERSION && cp *.patch $TMPDIR/protobuf && \
+      cd $TMPDIR/protobuf && git apply *.patch && \
+      git status && \
+      sh autogen.sh && emconfigure ./configure && emmake make && \
+      cp -r ./src/.libs $TMPDIR/ && \
+      ls $TMPDIR/.libs; \
+    fi
 
 USER root
 
