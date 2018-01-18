@@ -56,6 +56,12 @@ RUN if [[ "${BUILD_TARGET}" == "protobuf" ]]; then \
       ls $TMPDIR/.libs; \
     fi
 
+# trigger dummy build to cache corresponding binaryen port for wasm
+RUN mkdir -p $TMPDIR/hello && \
+  echo "int main() { return 0; }" > $TMPDIR/hello/hello.c && \
+  emcc $TMPDIR/hello/hello.c -s WASM=1 -s SINGLE_FILE=1 -o $TMPDIR/hello/hello.js && \
+  rm -rf $TMPDIR/hello
+
 USER root
 
 CMD emcc --version
