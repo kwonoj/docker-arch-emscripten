@@ -20,19 +20,6 @@ RUN pacman --noconfirm -S \
 # Change subsequent execution shell to bash
 SHELL ["/bin/bash", "-l", "-c"]
 
-# START gcc--------------------------------
-# Install gcc-6.3.1-2-x86_64.pkg.tar.xz
-# until binaryen clang failure (https://github.com/WebAssembly/binaryen/issues/1300) resolved with gcc 7.x
-
-RUN cd $TMPDIR && \
-  curl https://archive.archlinux.org/packages/g/gcc/gcc-6.3.1-2-x86_64.pkg.tar.xz > ./gcc-6.3.1-2-x86_64.pkg.tar.xz && \
-  curl https://archive.archlinux.org/packages/g/gcc/gcc-6.3.1-2-x86_64.pkg.tar.xz.sig > ./gcc-6.3.1-2-x86_64.pkg.tar.xz.sig && \
-  curl https://archive.archlinux.org/packages/g/gcc-libs/gcc-libs-6.3.1-2-x86_64.pkg.tar.xz > ./gcc-libs-6.3.1-2-x86_64.pkg.tar.xz && \
-  curl https://archive.archlinux.org/packages/g/gcc-libs/gcc-libs-6.3.1-2-x86_64.pkg.tar.xz.sig > ./gcc-libs-6.3.1-2-x86_64.pkg.tar.xz.sig && \
-  sudo pacman --noconfirm -U gcc-libs-6.3.1-2-x86_64.pkg.tar.xz gcc-6.3.1-2-x86_64.pkg.tar.xz
-
-# END gcc--------------------------------
-
 USER builder
 
 # Initialize emcc
