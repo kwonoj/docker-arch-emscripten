@@ -7,6 +7,8 @@ services:
 env:
   global:
     - DOCKER_REPO='ojkwon/arch-emscripten'
+    - EMSCRIPTEN_VERSION=1.37.28
+    - PROTOBUF_VERSION=3.5.1.1
   matrix:
     - BUILD_TARGET='base'
     - BUILD_TARGET='protobuf'
@@ -20,7 +22,7 @@ script:
   # set docker tag based on last commit short sha.
   - DOCKER_TAG=$DOCKER_REPO:${COMMIT}-$BUILD_TARGET
   - tput setaf 2; echo building docker image tagged as $DOCKER_TAG
-  - sudo docker build --tag $DOCKER_TAG --build-arg BUILD_TARGET=$BUILD_TARGET --build-arg PROTOBUF_VERSION=3.5.1.1 .
+  - sudo docker build --tag $DOCKER_TAG --build-arg BUILD_TARGET=$BUILD_TARGET --build-arg PROTOBUF_VERSION=$PROTOBUF_VERSION --build-arg EMSCRIPTEN_VERSION=$EMSCRIPTEN_VERSION .
   - |
     if [[ ! -z "${TRAVIS_TAG}" ]]; then
       tput setaf 2; echo this build is tagged versioned build, pushing into registry

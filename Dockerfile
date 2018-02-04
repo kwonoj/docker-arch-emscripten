@@ -4,6 +4,7 @@ MAINTAINER OJ Kwon <kwon.ohjoong@gmail.com>
 # Build time args
 ARG BUILD_TARGET=""
 ARG PROTOBUF_VERSION=""
+ARG EMSCRIPTEN_VERSION=""
 
 # Upgrade system
 RUN pacman --noconfirm -Syyu
@@ -14,13 +15,18 @@ RUN pacman --noconfirm -S \
   python \
   python-setuptools \
   python2-setuptools \
-  jre8-openjdk \
-  emscripten
+  jre8-openjdk
 
 # Change subsequent execution shell to bash
 SHELL ["/bin/bash", "-l", "-c"]
 
 USER builder
+
+# Install emcc
+RUN cd $TMPDIR && \
+  curl https://archive.archlinux.org/packages/e/emscripten/emscripten-$EMSCRIPTEN_VERSION-1-x86_64.pkg.tar.xz > ./emscripten-$EMSCRIPTEN_VERSION-1-x86_64.pkg.tar.xz && \
+  curl https://archive.archlinux.org/packages/e/emscripten/emscripten-$EMSCRIPTEN_VERSION-1-x86_64.pkg.tar.xz.sig > ./emscripten-$EMSCRIPTEN_VERSION-1-x86_64.pkg.tar.xz.sig && \
+  sudo pacman --noconfirm -U emscripten-$EMSCRIPTEN_VERSION-1-x86_64.pkg.tar.xz
 
 # Initialize emcc
 RUN emcc && emcc --version
@@ -38,9 +44,9 @@ RUN if [[ "${BUILD_TARGET}" == "protobuf" ]]; then \
       cd $TMPDIR/protobuf-wasm && git checkout v$PROTOBUF_VERSION && cp *.patch $TMPDIR/protobuf && \
       cd $TMPDIR/protobuf && git apply *.patch && \
       git status && \
-      sh autogen.sh && emconfigure ./configure && emmake make && \
+      sh autogen.sh && emconfigure ./configure CXXFLAGS="-O2" && emmake make && \
       cp -r ./src/.libs $TMPDIR/ && \
-      ls $TMPDIR/.libs; \
+      ls -al $TMPDIR/.libs; \
     fi
 
 # trigger dummy build to cache corresponding binaryen port for wasm
