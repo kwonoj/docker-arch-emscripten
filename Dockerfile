@@ -1,5 +1,4 @@
-FROM ojkwon/arch-nvm-node:301cc67-node8.9.1-npm5.6
-MAINTAINER OJ Kwon <kwon.ohjoong@gmail.com>
+FROM ojkwon/arch-nvm-node:ad663fe-node9.6.1-npm5.7.1
 
 # Build time args
 ARG BUILD_TARGET=""
@@ -24,9 +23,9 @@ USER builder
 
 # Install emcc
 RUN cd $TMPDIR && \
-  curl https://archive.archlinux.org/packages/e/emscripten/emscripten-$EMSCRIPTEN_VERSION-1-x86_64.pkg.tar.xz > ./emscripten-$EMSCRIPTEN_VERSION-1-x86_64.pkg.tar.xz && \
-  curl https://archive.archlinux.org/packages/e/emscripten/emscripten-$EMSCRIPTEN_VERSION-1-x86_64.pkg.tar.xz.sig > ./emscripten-$EMSCRIPTEN_VERSION-1-x86_64.pkg.tar.xz.sig && \
-  sudo pacman --noconfirm -U emscripten-$EMSCRIPTEN_VERSION-1-x86_64.pkg.tar.xz
+  curl https://archive.archlinux.org/packages/e/emscripten/emscripten-$EMSCRIPTEN_VERSION-x86_64.pkg.tar.xz > ./emscripten-$EMSCRIPTEN_VERSION-x86_64.pkg.tar.xz && \
+  curl https://archive.archlinux.org/packages/e/emscripten/emscripten-$EMSCRIPTEN_VERSION-x86_64.pkg.tar.xz.sig > ./emscripten-$EMSCRIPTEN_VERSION-x86_64.pkg.tar.xz.sig && \
+  sudo pacman --noconfirm -U emscripten-$EMSCRIPTEN_VERSION-x86_64.pkg.tar.xz
 
 # Initialize emcc
 RUN emcc && emcc --version
