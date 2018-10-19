@@ -7,8 +7,8 @@ services:
 env:
   global:
     - DOCKER_REPO='ojkwon/arch-emscripten'
-    - EMSCRIPTEN_VERSION=1.38.8-1
-    - PROTOBUF_VERSION=3.5.2
+    - EMSCRIPTEN_VERSION=1.38.13-1
+    - PROTOBUF_VERSION=3.6.1
   matrix:
     - BUILD_TARGET='base'
     - BUILD_TARGET='protobuf'
