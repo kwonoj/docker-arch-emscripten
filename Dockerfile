@@ -1,4 +1,4 @@
-FROM ojkwon/arch-nvm-node:4d451c2-node9.11.1-npm6.1.0
+FROM ojkwon/arch-nvm-node:339cd7e-node10.12.0-npm6.4.1
 
 # Build time args
 ARG BUILD_TARGET=""
