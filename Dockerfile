@@ -21,6 +21,14 @@ SHELL ["/bin/bash", "-l", "-c"]
 
 USER builder
 
+# Install specific version of protobuf corresponding to protobuf-wasm.
+RUN if [[ "${BUILD_TARGET}" == "protobuf" ]]; then \
+    cd $TMPDIR && \
+    curl https://github.com/protocolbuffers/protobuf/releases/download/v$PROTOBUF_VERSION/protobuf-all-$PROTOBUF_VERSION.tar.gz -L > protobuf-all-$PROTOBUF_VERSION.tar.gz && \
+    tar xvzf ./protobuf-all-$PROTOBUF_VERSION.tar.gz && cd protobuf-$PROTOBUF_VERSION && \
+    ./configure && make && make check && sudo make install && sudo ldconfig; \
+  fi
+
 # Install emcc
 RUN cd $TMPDIR && \
   curl https://archive.archlinux.org/packages/e/emscripten/emscripten-$EMSCRIPTEN_VERSION-x86_64.pkg.tar.xz > ./emscripten-$EMSCRIPTEN_VERSION-x86_64.pkg.tar.xz && \
@@ -29,12 +37,6 @@ RUN cd $TMPDIR && \
 
 # Initialize emcc
 RUN emcc && emcc --version
-
-# Install specific version of protobuf corresponding to protobuf-wasm.
-RUN cd $TMPDIR && \
-  curl https://archive.archlinux.org/packages/p/protobuf/protobuf-$PROTOBUF_VERSION-1-x86_64.pkg.tar.xz > ./protobuf-$PROTOBUF_VERSION-1-x86_64.pkg.tar.xz && \
-  curl https://archive.archlinux.org/packages/p/protobuf/protobuf-$PROTOBUF_VERSION-1-x86_64.pkg.tar.xz.sig > ./protobuf-$PROTOBUF_VERSION-1-x86_64.pkg.tar.xz.sig && \
-  sudo pacman --noconfirm -U protobuf-$PROTOBUF_VERSION-1-x86_64.pkg.tar.xz
 
 # Build emscripten-wasm as well to generate lib build will be placed build under `/home/builder/temp/.libs`
 RUN if [[ "${BUILD_TARGET}" == "protobuf" ]]; then \
@@ -51,7 +53,7 @@ RUN if [[ "${BUILD_TARGET}" == "protobuf" ]]; then \
 # trigger dummy build to cache corresponding binaryen port for wasm
 RUN mkdir -p $TMPDIR/hello && \
   echo "int main() { return 0; }" > $TMPDIR/hello/hello.c && \
-  emcc $TMPDIR/hello/hello.c -s WASM=1 -s SINGLE_FILE=1 -o $TMPDIR/hello/hello.js && \
+  emcc $TMPDIR/hello/hello.c -o $TMPDIR/hello/hello.js && \
   rm -rf $TMPDIR/hello
 
 USER root
