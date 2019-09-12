@@ -1,4 +1,4 @@
-FROM ojkwon/arch-nvm-node:d5a83cd-node12.7.0-npm6.10.2
+FROM ojkwon/arch-nvm-node:84e4ad7-node12.10.0-npm6.10.2
 
 # Build time args
 ARG BUILD_TARGET=""
@@ -31,9 +31,7 @@ RUN if [[ "${BUILD_TARGET}" == "protobuf" ]]; then \
 
 # Install emcc
 RUN cd $TMPDIR && \
-  curl https://archive.archlinux.org/packages/e/emscripten/emscripten-$EMSCRIPTEN_VERSION-x86_64.pkg.tar.xz > ./emscripten-$EMSCRIPTEN_VERSION-x86_64.pkg.tar.xz && \
-  curl https://archive.archlinux.org/packages/e/emscripten/emscripten-$EMSCRIPTEN_VERSION-x86_64.pkg.tar.xz.sig > ./emscripten-$EMSCRIPTEN_VERSION-x86_64.pkg.tar.xz.sig && \
-  sudo pacman --noconfirm -U emscripten-$EMSCRIPTEN_VERSION-x86_64.pkg.tar.xz
+  sudo pacman --noconfirm -U https://archive.archlinux.org/packages/e/emscripten/emscripten-$EMSCRIPTEN_VERSION-x86_64.pkg.tar.xz
 
 # Initialize emcc
 RUN emcc && emcc --version
