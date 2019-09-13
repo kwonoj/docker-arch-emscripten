@@ -21,6 +21,21 @@ SHELL ["/bin/bash", "-l", "-c"]
 
 USER builder
 
+# Install emcc
+# we want to use system installed node instead, manually uninstall from sdk
+RUN cd $TMPDIR && \
+  git clone https://github.com/emscripten-core/emsdk.git && \
+  cd emsdk && \
+  ./emsdk install $EMSCRIPTEN_VERSION && \
+  ./emsdk uninstall node-12.9.1-64bit && \
+  ./emsdk activate $EMSCRIPTEN_VERSION && \
+  printf '%s\n%s\n' "source $(pwd)/emsdk_env.sh" "$(cat ~/.bashrc)" > ~/.bashrc && \
+  sudo cp ~/.bashrc /root
+
+RUN echo $PATH
+# Initialize emcc
+RUN node -v && emcc -v
+
 # Install specific version of protobuf corresponding to protobuf-wasm.
 RUN if [[ "${BUILD_TARGET}" == "protobuf" ]]; then \
     cd $TMPDIR && \
@@ -28,13 +43,6 @@ RUN if [[ "${BUILD_TARGET}" == "protobuf" ]]; then \
     tar xvzf ./protobuf-all-$PROTOBUF_VERSION.tar.gz && cd protobuf-$PROTOBUF_VERSION && \
     ./configure && make && make check && sudo make install && sudo ldconfig; \
   fi
-
-# Install emcc
-RUN cd $TMPDIR && \
-  sudo pacman --noconfirm -U https://archive.archlinux.org/packages/e/emscripten/emscripten-$EMSCRIPTEN_VERSION-x86_64.pkg.tar.xz
-
-# Initialize emcc
-RUN emcc && emcc --version
 
 # Build emscripten-wasm as well to generate lib build will be placed build under `/home/builder/temp/.libs`
 RUN if [[ "${BUILD_TARGET}" == "protobuf" ]]; then \
@@ -55,5 +63,7 @@ RUN mkdir -p $TMPDIR/hello && \
   rm -rf $TMPDIR/hello
 
 USER root
+
+RUN node -v && emcc -v
 
 CMD emcc --version
