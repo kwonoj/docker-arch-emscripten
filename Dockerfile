@@ -1,4 +1,4 @@
-FROM ojkwon/arch-nvm-node:b1e67ca-node13.7.0-npm6.13.7
+FROM ojkwon/arch-nvm-node:311b338-node15.0.0-npm7.0.9
 
 # Build time args
 ARG BUILD_TARGET=""
@@ -27,7 +27,7 @@ RUN cd $TMPDIR && \
   git clone https://github.com/emscripten-core/emsdk.git && \
   cd emsdk && \
   ./emsdk install $EMSCRIPTEN_VERSION && \
-  ./emsdk uninstall node-12.9.1-64bit && \
+  ./emsdk uninstall node-12.18.1-64bit && \
   ./emsdk activate $EMSCRIPTEN_VERSION && \
   printf '%s\n%s\n' "source $(pwd)/emsdk_env.sh" "$(cat ~/.bashrc)" > ~/.bashrc && \
   sudo cp ~/.bashrc /root
@@ -66,4 +66,4 @@ USER root
 
 RUN node -v && emcc -v
 
-CMD emcc --version
+CMD node -v && emcc -v

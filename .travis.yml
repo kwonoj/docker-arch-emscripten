@@ -7,11 +7,12 @@ services:
 env:
   global:
     - DOCKER_REPO='ojkwon/arch-emscripten'
-    - EMSCRIPTEN_VERSION=1.39.6
+    - EMSCRIPTEN_VERSION=2.0.8
     - PROTOBUF_VERSION=3.9.0
   matrix:
     - BUILD_TARGET='base'
-    - BUILD_TARGET='protobuf'
+    # disabled for now
+    # - BUILD_TARGET='protobuf'
 
 matrix:
   # let whole build fails if one of matrix build config fails
